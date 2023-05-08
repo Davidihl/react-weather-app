@@ -1,23 +1,39 @@
 import './App.css';
-import logo from './logo.svg';
+import { useState } from 'react';
+import apiKey from './apiKey';
 
 export default function App() {
+  const [location, setLocation] = useState('');
+  const [weather, setWeather] = useState('');
+  const key = apiKey();
+
+  // Click handle, fetching the location with input value
+  const handleClick = async () => {
+    try {
+      const data = await (
+        await fetch(
+          `http://api.openweathermap.org/data/2.5/weather?q=${location}&APPID=${key}`,
+        )
+      ).json();
+      setWeather(data);
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div>
+        <label>
+          Location
+          <input
+            value={location}
+            onChange={(event) => setLocation(event.currentTarget.value)}
+          />
+        </label>
+        <button onClick={() => handleClick()}>Search</button>
+      </div>
+      <div>{weather ? weather.name : ''}</div>
     </div>
   );
 }
