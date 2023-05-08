@@ -1,13 +1,32 @@
 import './App.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import apiKey from './apiKey';
 
 export default function App() {
+  const key = apiKey();
   const [locationInput, setLocationInput] = useState('');
   const [location, setLocation] = useState('');
   const [recentLocation, setRecentLocation] = useState([]);
-  const key = apiKey();
   const [savedItems, setSavedItems] = useState(false);
+  const [cachedItems, setCachedItems] = useState([]);
+
+  // useEffect hook to load data from local storage
+  useEffect(() => {
+    const storedArray = localStorage.getItem('cachedItems');
+    if (storedArray) {
+      setCachedItems(JSON.parse(storedArray));
+    }
+  }, []);
+
+  // useEffect hook to save data to local storage when cachedItems changes
+  useEffect(() => {
+    localStorage.setItem('cachedItems', JSON.stringify(cachedItems));
+  }, [cachedItems]);
+
+  // Add item to local storage
+  function addItem(item) {
+    setCachedItems([item, ...cachedItems]);
+  }
 
   // Click handle, fetching the location with input value
   const handleClick = async () => {
@@ -23,6 +42,7 @@ export default function App() {
     }
   };
 
+  // Click add, save weather object into an array that gets mapped later on
   const saveLocation = () => {
     setSavedItems(true);
     setRecentLocation([location, ...recentLocation]);
@@ -66,7 +86,14 @@ export default function App() {
               <div id="wind">
                 <div>Wind speed: {location.wind.speed}</div>
               </div>
-              <button onClick={() => saveLocation()}>Save location</button>
+              <button
+                onClick={() => {
+                  saveLocation();
+                  addItem(location);
+                }}
+              >
+                Save location
+              </button>
             </>
           ) : (
             ''
@@ -87,6 +114,7 @@ export default function App() {
                 </div>
               </div>
             ))}
+            <button>Refresh all</button>
           </section>
         ) : (
           ''
