@@ -46,7 +46,6 @@ export default function App() {
   const saveLocation = () => {
     setSavedItems(true);
     setRecentLocation([location, ...recentLocation]);
-    console.log(recentLocation);
   };
 
   return (
@@ -63,7 +62,7 @@ export default function App() {
       </div>
       <div>
         <section id="current">
-          {location ? (
+          {location.cod === 200 ? (
             <>
               <h1>{location.name}</h1>
               <div>
